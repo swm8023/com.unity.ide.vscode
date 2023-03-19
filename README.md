@@ -12,13 +12,14 @@ Please follow the instrustions:
 ```text
   Name: package.openupm.com
   URL: https://package.openupm.com
+  Scope(s): com.tsk.ide.vscode
 ```
 - Click Save (or Apply)
 - Open Window/Package Manager
 - Click +
 - Select Add package by name... or Add package from git URL...
 - Paste com.tsk.ide.vscode into name
-- Paste 1.2.6 into version
+- Paste 1.2.7 into version
 - Click Add
 
 Alternatively, merge the snippet to Packages/manifest.json
@@ -28,11 +29,13 @@ Alternatively, merge the snippet to Packages/manifest.json
         {
             "name": "package.openupm.com",
             "url": "https://package.openupm.com",
-            "scopes": []
+            "scopes": [
+                "com.tsk.ide.vscode"
+            ]
         }
     ],
     "dependencies": {
-        "com.tsk.ide.vscode": "1.2.6"
+        "com.tsk.ide.vscode": "1.2.7"
     }
 }
 ```
