@@ -4,7 +4,6 @@ using NUnit.Framework;
 using UnityEditor.Compilation;
 using UnityEditor;
 
-
 namespace VSCodeEditor.Tests
 {
     namespace SolutionGeneration
@@ -19,8 +18,11 @@ namespace VSCodeEditor.Tests
                 synchronizer.Sync();
 
                 Assert.False(
-                    m_Builder.ReadFile(synchronizer.SolutionFile()).Contains("Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\")"),
-                    "Should not create project entry with no assemblies.");
+                    m_Builder
+                        .ReadFile(synchronizer.SolutionFile())
+                        .Contains("Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\")"),
+                    "Should not create project entry with no assemblies."
+                );
             }
 
             [Test]
@@ -28,7 +30,10 @@ namespace VSCodeEditor.Tests
             {
                 var synchronizer = m_Builder.Build();
 
-                Assert.False(synchronizer.SolutionExists(), "Should not create solution file before we call sync.");
+                Assert.False(
+                    synchronizer.SolutionExists(),
+                    "Should not create solution file before we call sync."
+                );
 
                 synchronizer.Sync();
 
@@ -45,7 +50,8 @@ namespace VSCodeEditor.Tests
 
                 Assert.False(
                     synchronizer.SolutionExists(),
-                    "Synchronizer should sync state with file system, after file has been deleted.");
+                    "Synchronizer should sync state with file system, after file has been deleted."
+                );
             }
 
             [Test]
@@ -54,13 +60,18 @@ namespace VSCodeEditor.Tests
                 var synchronizer = m_Builder.Build();
 
                 synchronizer.Sync();
-                Assert.AreEqual(4, m_Builder.WriteTimes, "Once for csproj, once for solution, once for workspace, and once for vscode settings");
+                Assert.AreEqual(
+                    4,
+                    m_Builder.WriteTimes,
+                    "Once for csproj, once for solution, once for workspace, and once for vscode settings"
+                );
 
                 synchronizer.Sync();
                 Assert.AreEqual(
                     4,
                     m_Builder.WriteTimes,
-                    "When content doesn't change we shouldn't re-sync");
+                    "When content doesn't change we shouldn't re-sync"
+                );
             }
 
             [Test]
@@ -69,12 +80,33 @@ namespace VSCodeEditor.Tests
                 var synchronizer = m_Builder.Build();
 
                 synchronizer.Sync();
-                Assert.AreEqual(4, m_Builder.WriteTimes, "Once for csproj, once for solution, once for workspace file, and once vscode settings");
+                Assert.AreEqual(
+                    4,
+                    m_Builder.WriteTimes,
+                    "Once for csproj, once for solution, once for workspace file, and once vscode settings"
+                );
 
-                m_Builder.WithAssemblies(new[] { new Assembly("Another", "path/to/Assembly.dll", new[] { "file.cs" }, new string[0], new Assembly[0], new string[0], AssemblyFlags.None) });
+                m_Builder.WithAssemblies(
+                    new[]
+                    {
+                        new Assembly(
+                            "Another",
+                            "path/to/Assembly.dll",
+                            new[] { "file.cs" },
+                            new string[0],
+                            new Assembly[0],
+                            new string[0],
+                            AssemblyFlags.None
+                        )
+                    }
+                );
 
                 synchronizer.Sync();
-                Assert.AreEqual(6, m_Builder.WriteTimes, "Should re-sync the solution file and the csproj");
+                Assert.AreEqual(
+                    6,
+                    m_Builder.WriteTimes,
+                    "Should re-sync the solution file and the csproj"
+                );
             }
 
             [Test]
@@ -83,7 +115,8 @@ namespace VSCodeEditor.Tests
                 var synchronizer = m_Builder.Build();
 
                 // Pre-seed solution file with empty property section
-                var solutionText = "Microsoft Visual Studio Solution File, Format Version 11.00\n# Visual Studio 2010\nGlobal\nEndGlobal";
+                var solutionText =
+                    "Microsoft Visual Studio Solution File, Format Version 11.00\n# Visual Studio 2010\nGlobal\nEndGlobal";
                 m_Builder.WithSolutionText(solutionText);
 
                 synchronizer.Sync();
@@ -91,16 +124,24 @@ namespace VSCodeEditor.Tests
                 Assert.AreNotEqual(
                     solutionText,
                     m_Builder.ReadFile(synchronizer.SolutionFile()),
-                    "Should rewrite solution text");
+                    "Should rewrite solution text"
+                );
             }
 
             [TestCase("dll")]
             [TestCase("asmdef")]
-            public void AfterSync_WillResync_WhenReimportWithSpecialFileExtensions(string reimportedFile)
+            public void AfterSync_WillResync_WhenReimportWithSpecialFileExtensions(
+                string reimportedFile
+            )
             {
                 var synchronizer = m_Builder.Build();
 
-                Assert.That(synchronizer.SyncIfNeeded(new List<string>(), new[] {$"reimport.{reimportedFile}"}));
+                Assert.That(
+                    synchronizer.SyncIfNeeded(
+                        new List<string>(),
+                        new[] { $"reimport.{reimportedFile}" }
+                    )
+                );
             }
 
             [Test]
@@ -110,7 +151,9 @@ namespace VSCodeEditor.Tests
 
                 synchronizer.Sync();
 
-                Assert.IsFalse(synchronizer.SyncIfNeeded(new List<string>(), new[] {"ShouldNotSync.txt"}));
+                Assert.IsFalse(
+                    synchronizer.SyncIfNeeded(new List<string>(), new[] { "ShouldNotSync.txt" })
+                );
             }
 
             [Test]
@@ -120,7 +163,12 @@ namespace VSCodeEditor.Tests
 
                 synchronizer.Sync();
 
-                Assert.IsFalse(synchronizer.SyncIfNeeded(new List<string> {" reimport.random"}, new string[0]));
+                Assert.IsFalse(
+                    synchronizer.SyncIfNeeded(
+                        new List<string> { " reimport.random" },
+                        new string[0]
+                    )
+                );
             }
 
             [Test]
@@ -133,22 +181,24 @@ namespace VSCodeEditor.Tests
                 var newAssembly = new Assembly(
                     "MyAssembly",
                     "myOutput/path",
-                    new[] {"MyFile.cs"},
+                    new[] { "MyFile.cs" },
                     new string[0],
                     new Assembly[0],
                     new string[0],
-                    AssemblyFlags.None);
-                var newAssemblies = new[] {m_Builder.Assembly, newAssembly};
+                    AssemblyFlags.None
+                );
+                var newAssemblies = new[] { m_Builder.Assembly, newAssembly };
                 m_Builder.WithAssemblies(newAssemblies);
-                m_Builder.AssignFilesToAssembly(new[] {"MyFile.cs"}, newAssembly);
+                m_Builder.AssignFilesToAssembly(new[] { "MyFile.cs" }, newAssembly);
 
-                synchronizer.SyncIfNeeded(new List<string> {"MyFile.cs"}, new string[0]);
+                synchronizer.SyncIfNeeded(new List<string> { "MyFile.cs" }, new string[0]);
 
                 var solutionFileContent = m_Builder.ReadFile(synchronizer.SolutionFile());
                 StringAssert.Contains(
                     "Project(\"{}\") = \"MyAssembly\", \"MyAssembly.csproj\"",
                     solutionFileContent,
-                    "After synchronizing a new file from a new Assembly. The new assembly should be added to solution file.");
+                    "After synchronizing a new file from a new Assembly. The new assembly should be added to solution file."
+                );
             }
 
             [Test]
@@ -158,18 +208,23 @@ namespace VSCodeEditor.Tests
 
                 synchronizer.Sync(); // Generate solution and csproj
 
-                Assert.AreEqual(4, m_Builder.WriteTimes, "Should have written csproj, sln, workspace, and vscode setting files");
+                Assert.AreEqual(
+                    4,
+                    m_Builder.WriteTimes,
+                    "Should have written csproj, sln, workspace, and vscode setting files"
+                );
 
-                m_Builder.WithAssetFiles(new[] {"X.cs"});
+                m_Builder.WithAssetFiles(new[] { "X.cs" });
 
-                var res = synchronizer.SyncIfNeeded(new List<string> {"X.cs"}, new string[0]);
+                var res = synchronizer.SyncIfNeeded(new List<string> { "X.cs" }, new string[0]);
 
                 Assert.IsTrue(res, "Should support file extension");
 
                 Assert.AreEqual(
                     4,
                     m_Builder.WriteTimes,
-                    "Should not have rewritten neither csproj, sln, workspace, nor vscode setting files");
+                    "Should not have rewritten neither csproj, sln, workspace, nor vscode setting files"
+                );
             }
 
             [Test]
@@ -179,23 +234,33 @@ namespace VSCodeEditor.Tests
 
                 synchronizer.Sync(); // Generate solution and csproj
 
-                Assert.AreEqual(4, m_Builder.WriteTimes, "Should have written csproj, sln, workspace, and vscode setting files");
+                Assert.AreEqual(
+                    4,
+                    m_Builder.WriteTimes,
+                    "Should have written csproj, sln, workspace, and vscode setting files"
+                );
 
-                string[] files = {"X.cs"};
+                string[] files = { "X.cs" };
                 m_Builder
                     .WithAssetFiles(files)
                     .AssignFilesToAssembly(
                         files,
-                        new Assembly("", "", files, new string[0], new Assembly[0], new string[0], AssemblyFlags.EditorAssembly));
+                        new Assembly(
+                            "",
+                            "",
+                            files,
+                            new string[0],
+                            new Assembly[0],
+                            new string[0],
+                            AssemblyFlags.EditorAssembly
+                        )
+                    );
 
-                var res = synchronizer.SyncIfNeeded(new List<string> {"X.cs"}, new string[0]);
+                var res = synchronizer.SyncIfNeeded(new List<string> { "X.cs" }, new string[0]);
 
                 Assert.IsTrue(res, "Should support file extension");
 
-                Assert.AreEqual(
-                    4,
-                    m_Builder.WriteTimes,
-                    "Should only rewrite sln file");
+                Assert.AreEqual(4, m_Builder.WriteTimes, "Should only rewrite sln file");
             }
 
             [Test, TestCaseSource(nameof(s_ExtensionsRequireReSync))]
@@ -203,12 +268,27 @@ namespace VSCodeEditor.Tests
             {
                 var synchronizer = m_Builder.Build();
 
-                Assert.That(synchronizer.SyncIfNeeded(new List<string> {$"reimport.{fileExtension}"}, new string[0]));
+                Assert.That(
+                    synchronizer.SyncIfNeeded(
+                        new List<string> { $"reimport.{fileExtension}" },
+                        new string[0]
+                    )
+                );
             }
 
-            static string[] s_ExtensionsRequireReSync =
+            static readonly string[] s_ExtensionsRequireReSync =
             {
-                "dll", "asmdef", "cs", "uxml", "uss", "shader", "compute", "cginc", "hlsl", "glslinc", "template",
+                "dll",
+                "asmdef",
+                "cs",
+                "uxml",
+                "uss",
+                "shader",
+                "compute",
+                "cginc",
+                "hlsl",
+                "glslinc",
+                "template",
                 "raytrace"
             };
         }
@@ -222,10 +302,15 @@ namespace VSCodeEditor.Tests
 
                 synchronizer.Sync();
 
-                string[] syncedSolutionText = m_Builder.ReadFile(synchronizer.SolutionFile()).Split(new[] {"\r\n"}, StringSplitOptions.None);
+                string[] syncedSolutionText = m_Builder
+                    .ReadFile(synchronizer.SolutionFile())
+                    .Split(new[] { "\r\n" }, StringSplitOptions.None);
                 Assert.That(syncedSolutionText.Length, Is.GreaterThanOrEqualTo(4));
                 Assert.AreEqual("", syncedSolutionText[0]);
-                Assert.AreEqual("Microsoft Visual Studio Solution File, Format Version 11.00", syncedSolutionText[1]);
+                Assert.AreEqual(
+                    "Microsoft Visual Studio Solution File, Format Version 11.00",
+                    syncedSolutionText[1]
+                );
                 Assert.AreEqual("# Visual Studio 2010", syncedSolutionText[2]);
             }
 
@@ -240,33 +325,38 @@ namespace VSCodeEditor.Tests
                     .Build();
 
                 // solutionguid, solutionname, projectguid
-                var solutionExpected = string.Join("\r\n", new[]
-                {
-                    @"",
-                    @"Microsoft Visual Studio Solution File, Format Version 11.00",
-                    @"# Visual Studio 2010",
-                    @"Project(""{{{0}}}"") = ""{2}"", ""{2}.csproj"", ""{{{1}}}""",
-                    @"EndProject",
-                    @"Global",
-                    @"    GlobalSection(SolutionConfigurationPlatforms) = preSolution",
-                    @"        Debug|Any CPU = Debug|Any CPU",
-                    @"    EndGlobalSection",
-                    @"    GlobalSection(ProjectConfigurationPlatforms) = postSolution",
-                    @"        {{{1}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU",
-                    @"        {{{1}}}.Debug|Any CPU.Build.0 = Debug|Any CPU",
-                    @"    EndGlobalSection",
-                    @"    GlobalSection(SolutionProperties) = preSolution",
-                    @"        HideSolutionNode = FALSE",
-                    @"    EndGlobalSection",
-                    @"EndGlobal",
-                    @""
-                }).Replace("    ", "\t");
+                var solutionExpected = string.Join(
+                        "\r\n",
+                        new[]
+                        {
+                            @"",
+                            @"Microsoft Visual Studio Solution File, Format Version 11.00",
+                            @"# Visual Studio 2010",
+                            @"Project(""{{{0}}}"") = ""{2}"", ""{2}.csproj"", ""{{{1}}}""",
+                            @"EndProject",
+                            @"Global",
+                            @"    GlobalSection(SolutionConfigurationPlatforms) = preSolution",
+                            @"        Debug|Any CPU = Debug|Any CPU",
+                            @"    EndGlobalSection",
+                            @"    GlobalSection(ProjectConfigurationPlatforms) = postSolution",
+                            @"        {{{1}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU",
+                            @"        {{{1}}}.Debug|Any CPU.Build.0 = Debug|Any CPU",
+                            @"    EndGlobalSection",
+                            @"    GlobalSection(SolutionProperties) = preSolution",
+                            @"        HideSolutionNode = FALSE",
+                            @"    EndGlobalSection",
+                            @"EndGlobal",
+                            @""
+                        }
+                    )
+                    .Replace("    ", "\t");
 
                 var solutionTemplate = string.Format(
                     solutionExpected,
                     solutionGUID,
                     projectGUID,
-                    m_Builder.Assembly.name);
+                    m_Builder.Assembly.name
+                );
 
                 synchronizer.Sync();
 
@@ -274,22 +364,23 @@ namespace VSCodeEditor.Tests
             }
         }
 
-        class OnGenerationSolution : ProjectGenerationTestBase 
+        class OnGenerationSolution : ProjectGenerationTestBase
         {
             static bool m_HasCalledOnGeneratedSlnSolution = false;
 
             const string solutionGUID = "SolutionGUID";
             const string newSolutionGUID = "1234567";
 
-            // This is here because the fact this OnGenerationCallbacks is around 
+            // This is here because the fact this OnGenerationCallbacks is around
             // will cause it to get executed.
             static bool m_isRunningThisTest = false;
 
-            public class OnGenerationCallbacks : AssetPostprocessor 
+            public class OnGenerationCallbacks : AssetPostprocessor
             {
                 public static string OnGeneratedSlnSolution(string path, string content)
                 {
-                    if(!m_isRunningThisTest) return content;
+                    if (!m_isRunningThisTest)
+                        return content;
 
                     m_HasCalledOnGeneratedSlnSolution = true;
                     return content.Replace(solutionGUID, newSolutionGUID);
@@ -314,9 +405,7 @@ namespace VSCodeEditor.Tests
             {
                 m_isRunningThisTest = true;
 
-                var synchronizer = m_Builder
-                    .WithSolutionGuid(solutionGUID)
-                    .Build();
+                var synchronizer = m_Builder.WithSolutionGuid(solutionGUID).Build();
 
                 synchronizer.Sync();
 

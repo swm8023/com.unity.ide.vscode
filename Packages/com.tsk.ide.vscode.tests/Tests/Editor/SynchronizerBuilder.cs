@@ -15,17 +15,22 @@ namespace VSCodeEditor.Tests
         }
 
         IGenerator m_Generator;
-        Mock<IAssemblyNameProvider> m_AssemblyProvider = new Mock<IAssemblyNameProvider>();
+        readonly Mock<IAssemblyNameProvider> m_AssemblyProvider = new();
         public static readonly string projectDirectory = "/FullPath/Example".NormalizePath();
-
-        MockFileIO m_FileIoMock = new MockFileIO();
-        Mock<IGUIDGenerator> m_GUIDGenerator = new Mock<IGUIDGenerator>();
+        readonly MockFileIO m_FileIoMock = new();
+        readonly Mock<IGUIDGenerator> m_GUIDGenerator = new();
 
         public string ReadFile(string fileName) => m_FileIoMock.ReadAllText(fileName);
-        public static string ProjectFilePath(Assembly assembly) => Path.Combine(projectDirectory, $"{assembly.name}.csproj");
+
+        public static string ProjectFilePath(Assembly assembly) =>
+            Path.Combine(projectDirectory, $"{assembly.name}.csproj");
+
         public string ReadProjectFile(Assembly assembly) => ReadFile(ProjectFilePath(assembly));
+
         public bool FileExists(string fileName) => m_FileIoMock.Exists(fileName);
+
         public void DeleteFile(string fileName) => m_FileIoMock.DeleteFile(fileName);
+
         public int WriteTimes => m_FileIoMock.WriteTimes;
         public int ReadTimes => m_FileIoMock.ReadTimes;
 
@@ -38,7 +43,9 @@ namespace VSCodeEditor.Tests
                     return m_Assemblies[0];
                 }
 
-                throw new BuilderError("An empty list of assemblies has been populated, and then the first assembly was requested.");
+                throw new BuilderError(
+                    "An empty list of assemblies has been populated, and then the first assembly was requested."
+                );
             }
         }
 
@@ -51,7 +58,12 @@ namespace VSCodeEditor.Tests
 
         public IGenerator Build()
         {
-            return m_Generator = new ProjectGeneration(projectDirectory, m_AssemblyProvider.Object, m_FileIoMock, m_GUIDGenerator.Object);
+            return m_Generator = new ProjectGeneration(
+                projectDirectory,
+                m_AssemblyProvider.Object,
+                m_FileIoMock,
+                m_GUIDGenerator.Object
+            );
         }
 
         public SynchronizerBuilder WithSolutionText(string solutionText)
@@ -67,24 +79,36 @@ namespace VSCodeEditor.Tests
 
         public SynchronizerBuilder WithSolutionGuid(string solutionGuid)
         {
-            m_GUIDGenerator.Setup(x => x.SolutionGuid(Path.GetFileName(projectDirectory), "cs")).Returns(solutionGuid);
+            m_GUIDGenerator
+                .Setup(x => x.SolutionGuid(Path.GetFileName(projectDirectory), "cs"))
+                .Returns(solutionGuid);
             return this;
         }
 
         public SynchronizerBuilder WithProjectGuid(string projectGuid, Assembly assembly)
         {
-            m_GUIDGenerator.Setup(x => x.ProjectGuid(Path.GetFileName(projectDirectory), assembly.name)).Returns(projectGuid);
+            m_GUIDGenerator
+                .Setup(x => x.ProjectGuid(Path.GetFileName(projectDirectory), assembly.name))
+                .Returns(projectGuid);
             return this;
         }
 
         public SynchronizerBuilder WithAssemblies(Assembly[] assemblies)
         {
             m_Assemblies = assemblies;
-            m_AssemblyProvider.Setup(x => x.GetAssemblies(It.IsAny<Func<string, bool>>())).Returns(m_Assemblies);
+            m_AssemblyProvider
+                .Setup(x => x.GetAssemblies(It.IsAny<Func<string, bool>>()))
+                .Returns(m_Assemblies);
             return this;
         }
 
-        public SynchronizerBuilder WithAssemblyData(string[] files = null, string[] defines = null, Assembly[] assemblyReferences = null, string[] compiledAssemblyReferences = null, bool unsafeSettings = false)
+        public SynchronizerBuilder WithAssemblyData(
+            string[] files = null,
+            string[] defines = null,
+            Assembly[] assemblyReferences = null,
+            string[] compiledAssemblyReferences = null,
+            bool unsafeSettings = false
+        )
         {
             var assembly = new Assembly(
                 "Test",
@@ -93,7 +117,8 @@ namespace VSCodeEditor.Tests
                 defines ?? new string[0],
                 assemblyReferences ?? new Assembly[0],
                 compiledAssemblyReferences ?? new string[0],
-                AssemblyFlags.None);
+                AssemblyFlags.None
+            );
             assembly.compilerOptions.AllowUnsafeCode = unsafeSettings;
             return WithAssembly(assembly);
         }
@@ -112,33 +137,56 @@ namespace VSCodeEditor.Tests
 
         public SynchronizerBuilder AssignFilesToAssembly(string[] files, Assembly assembly)
         {
-            m_AssemblyProvider.Setup(x => x.GetAssemblyNameFromScriptPath(It.Is<string>(file => files.Contains(file)))).Returns(assembly.name);
+            m_AssemblyProvider
+                .Setup(
+                    x =>
+                        x.GetAssemblyNameFromScriptPath(It.Is<string>(file => files.Contains(file)))
+                )
+                .Returns(assembly.name);
             return this;
         }
 
-        public SynchronizerBuilder WithResponseFileData(Assembly assembly, string responseFile, string[] defines = null, string[] errors = null, string[] fullPathReferences = null, string[] otherArguments = null, bool _unsafe = false)
+        public SynchronizerBuilder WithResponseFileData(
+            Assembly assembly,
+            string responseFile,
+            string[] defines = null,
+            string[] errors = null,
+            string[] fullPathReferences = null,
+            string[] otherArguments = null,
+            bool _unsafe = false
+        )
         {
             assembly.compilerOptions.ResponseFiles = new[] { responseFile };
-            m_AssemblyProvider.Setup(x => x.ParseResponseFile(responseFile, projectDirectory, It.IsAny<string[]>())).Returns(new ResponseFileData
-            {
-                Defines = defines ?? new string[0],
-                Errors = errors ?? new string[0],
-                FullPathReferences = fullPathReferences ?? new string[0],
-                OtherArguments = otherArguments ?? new string[0],
-                Unsafe = _unsafe,
-            });
+            m_AssemblyProvider
+                .Setup(
+                    x => x.ParseResponseFile(responseFile, projectDirectory, It.IsAny<string[]>())
+                )
+                .Returns(
+                    new ResponseFileData
+                    {
+                        Defines = defines ?? new string[0],
+                        Errors = errors ?? new string[0],
+                        FullPathReferences = fullPathReferences ?? new string[0],
+                        OtherArguments = otherArguments ?? new string[0],
+                        Unsafe = _unsafe,
+                    }
+                );
             return this;
         }
 
         public SynchronizerBuilder WithPackageInfo(string assetPath)
         {
-            m_AssemblyProvider.Setup(x => x.FindForAssetPath(assetPath)).Returns(default(UnityEditor.PackageManager.PackageInfo));
+            m_AssemblyProvider
+                .Setup(x => x.FindForAssetPath(assetPath))
+                .Returns(default(UnityEditor.PackageManager.PackageInfo));
             return this;
         }
 
         public SynchronizerBuilder WithPackageAsset(string assetPath, bool isInternalPackageAsset)
         {
-            m_AssemblyProvider.Setup(x => x.IsInternalizedPackagePath(assetPath)).Returns(isInternalPackageAsset);
+            m_AssemblyProvider
+                .Setup(x => x.IsInternalizedPackagePath(assetPath))
+                .Returns(isInternalPackageAsset);
             return this;
         }
 
@@ -161,7 +209,9 @@ namespace VSCodeEditor.Tests
         public SynchronizerBuilder WithRoslynAnalyzers(string[] roslynAnalyzerDllPaths)
         {
 #if !ROSLYN_ANALYZER_FIX
-            m_AssemblyProvider.Setup(x => x.GetRoslynAnalyzerPaths()).Returns(roslynAnalyzerDllPaths);
+            m_AssemblyProvider
+                .Setup(x => x.GetRoslynAnalyzerPaths())
+                .Returns(roslynAnalyzerDllPaths);
 #else
             foreach (var assembly in m_Assemblies)
             {
