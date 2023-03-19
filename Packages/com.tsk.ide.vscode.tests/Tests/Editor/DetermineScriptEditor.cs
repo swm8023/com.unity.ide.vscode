@@ -26,7 +26,9 @@ namespace VSCodeEditor.Tests
         [TestCase(@"C:\Program Files\Microsoft VS Code Insiders\Code.exe")]
         [TestCase(@"C:\Users\Username\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd")]
         [TestCase(@"C:\Users\Username\AppData\Local\Programs\Microsoft VS Code\Code.exe")]
-        [TestCase(@"C:\Users\Username\AppData\Local\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd")]
+        [TestCase(
+            @"C:\Users\Username\AppData\Local\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+        )]
         [TestCase(@"C:\Users\Username\AppData\Local\Programs\Microsoft VS Code Insiders\Code.exe")]
         [UnityPlatform(RuntimePlatform.WindowsEditor)]
         public void WindowsPathDiscovery(string path)
@@ -50,14 +52,20 @@ namespace VSCodeEditor.Tests
             var discovery = new Mock<IDiscovery>();
             var generator = new Mock<IGenerator>();
 
-            discovery.Setup(x => x.PathCallback()).Returns(new[]
-            {
-                new CodeEditor.Installation
-                {
-                    Path = path,
-                    Name = path.Contains("Insiders") ? "Visual Studio Code Insiders" : "Visual Studio Code"
-                }
-            });
+            discovery
+                .Setup(x => x.PathCallback())
+                .Returns(
+                    new[]
+                    {
+                        new CodeEditor.Installation
+                        {
+                            Path = path,
+                            Name = path.Contains("Insiders")
+                                ? "Visual Studio Code Insiders"
+                                : "Visual Studio Code"
+                        }
+                    }
+                );
 
             var editor = new VSCodeScriptEditor(discovery.Object, generator.Object);
 

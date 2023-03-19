@@ -30,9 +30,11 @@ namespace VSCodeEditor.Tests
 
         protected static string MakeAbsolutePathTestImplementation(string path)
         {
-            return Path.IsPathRooted(path) ? path : Path.Combine(SynchronizerBuilder.projectDirectory, path);
+            return Path.IsPathRooted(path)
+                ? path
+                : Path.Combine(SynchronizerBuilder.projectDirectory, path);
         }
-        
+
         protected static string MakeAbsolutePath(string path)
         {
             return Path.IsPathRooted(path) ? path : Path.GetFullPath(path);

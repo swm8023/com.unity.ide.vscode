@@ -8,7 +8,7 @@ namespace VSCodeEditor.Tests
         {
             var languageVersion =
 #if UNITY_2020_2_OR_NEWER
-                new ScriptCompilerOptions().LanguageVersion;
+            new ScriptCompilerOptions().LanguageVersion;
 #else
                 "latest";
 #endif

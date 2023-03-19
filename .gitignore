@@ -36,6 +36,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+[Nn]uGet/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -456,6 +457,8 @@ Assets/StreamingAssets/crashlytics-build.properties
 ### VisualStudioCode ###
 */.vscode/*
 .vscode
+.editorconfig
+omnisharp.json
 
 ### My stuff ###
 **/ValidationSuiteResults/*

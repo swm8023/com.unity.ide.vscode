@@ -8,7 +8,7 @@ namespace VSCodeEditor.Tests
 {
     class MockFileIO : IFileIO
     {
-        Dictionary<string, string> fileToContent = new Dictionary<string, string>();
+        readonly Dictionary<string, string> fileToContent = new();
         public int WriteTimes { get; private set; }
         public int ReadTimes { get; private set; }
         public int ExistTimes { get; private set; }
@@ -32,11 +32,15 @@ namespace VSCodeEditor.Tests
             byte[] utfBytes = utf8.GetBytes(content);
             fileToContent[fileName] = utf8.GetString(utfBytes, 0, utfBytes.Length);
         }
-        
+
         public string EscapedRelativePathFor(string file, string projectDirectory)
         {
-            return file.NormalizePath().StartsWith($"{projectDirectory}{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
-                ? file.Substring(projectDirectory.Length + 1)
+            return file.NormalizePath()
+                .StartsWith(
+                    $"{projectDirectory}{Path.DirectorySeparatorChar}",
+                    StringComparison.Ordinal
+                )
+                ? file[(projectDirectory.Length + 1)..]
                 : file.NormalizePath();
         }
 
@@ -119,7 +123,10 @@ namespace VSCodeEditor.Tests
 
             var exception = Assert.Throws<Exception>(() => m_FileIo.DeleteFile(fileName));
 
-            StringAssert.AreEqualIgnoringCase($"{fileName}: has not been created.", exception.Message);
+            StringAssert.AreEqualIgnoringCase(
+                $"{fileName}: has not been created.",
+                exception.Message
+            );
         }
 
         [Test]
