@@ -17,16 +17,21 @@ namespace VSCodeEditor.Runtime_spec.CSProject
     {
         [SerializeField]
         protected IGenerator m_ProjectGeneration;
+
         [SerializeField]
-        List<string> m_GeneratedFiles = new List<string>();
+        readonly List<string> m_GeneratedFiles = new();
+
         [SerializeField]
-        List<string> m_DirectoriesToDelete = new List<string>();
+        readonly List<string> m_DirectoriesToDelete = new();
+
         [SerializeField]
         protected string m_CsProjPath;
+
         [SerializeField]
         protected DateTime m_LastWritten;
 
-        protected const string k_EmptyCSharpScript = @"
+        protected const string k_EmptyCSharpScript =
+            @"
 using UnityEngine;
 public class SimpleCSharpScript : MonoBehaviour
 {
@@ -36,7 +41,8 @@ public class SimpleCSharpScript : MonoBehaviour
 }";
 
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             var projectDirectory = Directory.GetParent(Application.dataPath).FullName;
             m_ProjectGeneration = new ProjectGeneration(projectDirectory);
         }
@@ -93,7 +99,10 @@ public class SimpleCSharpScript : MonoBehaviour
 
         protected override IEnumerator TearDown()
         {
-            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, m_Original);
+            EditorUserBuildSettings.SwitchActiveBuildTarget(
+                BuildTargetGroup.Standalone,
+                m_Original
+            );
             return base.TearDown();
         }
 
@@ -107,7 +116,8 @@ public class SimpleCSharpScript : MonoBehaviour
                 "PLATFORM_STANDALONE_WIN",
                 UnityEditor.BuildTarget.StandaloneLinux64,
                 "PLATFORM_STANDALONE_LINUX",
-                () => {});
+                () => { }
+            );
         }
 
         [UnityPlatform(RuntimePlatform.OSXEditor)]
@@ -120,7 +130,8 @@ public class SimpleCSharpScript : MonoBehaviour
                 "PLATFORM_STANDALONE_OSX",
                 UnityEditor.BuildTarget.StandaloneWindows64,
                 "PLATFORM_STANDALONE_WIN",
-                () => {});
+                () => { }
+            );
         }
 
         [UnityPlatform(RuntimePlatform.LinuxEditor)]
@@ -133,7 +144,8 @@ public class SimpleCSharpScript : MonoBehaviour
                 "PLATFORM_STANDALONE_LINUX",
                 UnityEditor.BuildTarget.StandaloneOSX,
                 "PLATFORM_STANDALONE_OSX",
-                () => {});
+                () => { }
+            );
         }
 
         [UnityPlatform(RuntimePlatform.WindowsEditor)]
@@ -146,7 +158,11 @@ public class SimpleCSharpScript : MonoBehaviour
                 "PLATFORM_STANDALONE_WIN",
                 UnityEditor.BuildTarget.StandaloneLinux64,
                 "PLATFORM_STANDALONE_LINUX",
-                () => { CopyScriptToAssetsFolder(Application.dataPath, "SimpleCSharpScript2.cs", " "); });
+                () =>
+                {
+                    CopyScriptToAssetsFolder(Application.dataPath, "SimpleCSharpScript2.cs", " ");
+                }
+            );
         }
 
         [UnityPlatform(RuntimePlatform.OSXEditor)]
@@ -159,7 +175,11 @@ public class SimpleCSharpScript : MonoBehaviour
                 "PLATFORM_STANDALONE_OSX",
                 UnityEditor.BuildTarget.StandaloneWindows64,
                 "PLATFORM_STANDALONE_WIN",
-                () => { CopyScriptToAssetsFolder(Application.dataPath, "SimpleCSharpScript2.cs", " "); });
+                () =>
+                {
+                    CopyScriptToAssetsFolder(Application.dataPath, "SimpleCSharpScript2.cs", " ");
+                }
+            );
         }
 
         [UnityPlatform(RuntimePlatform.LinuxEditor)]
@@ -172,7 +192,11 @@ public class SimpleCSharpScript : MonoBehaviour
                 "PLATFORM_STANDALONE_LINUX",
                 UnityEditor.BuildTarget.StandaloneOSX,
                 "PLATFORM_STANDALONE_OSX",
-                () => { CopyScriptToAssetsFolder(Application.dataPath, "SimpleCSharpScript2.cs", " "); });
+                () =>
+                {
+                    CopyScriptToAssetsFolder(Application.dataPath, "SimpleCSharpScript2.cs", " ");
+                }
+            );
         }
 
         IEnumerator AssertSynchronizedWhenActiveBuildTargetChanges(
@@ -180,10 +204,18 @@ public class SimpleCSharpScript : MonoBehaviour
             string platformDefine,
             UnityEditor.BuildTarget changeTarget,
             string changeDefine,
-            Action action)
+            Action action
+        )
         {
-            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, platformTarget);
-            CopyScriptToAssetsFolder(Application.dataPath, "SimpleCSharpScript.cs", k_EmptyCSharpScript);
+            EditorUserBuildSettings.SwitchActiveBuildTarget(
+                BuildTargetGroup.Standalone,
+                platformTarget
+            );
+            CopyScriptToAssetsFolder(
+                Application.dataPath,
+                "SimpleCSharpScript.cs",
+                k_EmptyCSharpScript
+            );
 
             yield return new RecompileScripts(true);
             m_ProjectGeneration.Sync();
@@ -199,7 +231,10 @@ public class SimpleCSharpScript : MonoBehaviour
             File.SetLastWriteTime(m_CsProjPath, m_LastWritten);
 
             //switch target to another one than the standalone target for the current platform
-            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, changeTarget);
+            EditorUserBuildSettings.SwitchActiveBuildTarget(
+                BuildTargetGroup.Standalone,
+                changeTarget
+            );
 
             yield return new RecompileScripts(true);
             m_ProjectGeneration.Sync();
@@ -213,7 +248,9 @@ public class SimpleCSharpScript : MonoBehaviour
         static void AssertProjectContainsDefine(string csProjPath, string expectedDefine)
         {
             var content = File.ReadAllText(csProjPath);
-            Assert.IsTrue(Regex.IsMatch(content, $"<DefineConstants>.*;{expectedDefine}.*</DefineConstants>"));
+            Assert.IsTrue(
+                Regex.IsMatch(content, $"<DefineConstants>.*;{expectedDefine}.*</DefineConstants>")
+            );
         }
 
         delegate bool Condition();
@@ -224,7 +261,9 @@ public class SimpleCSharpScript : MonoBehaviour
             while (!condition())
             {
                 if (DateTime.Now - started > k_Timeout)
-                    throw new TimeoutException($"Timeout while waiting for c# project to be rewritten for {k_Timeout.TotalSeconds} seconds");
+                    throw new TimeoutException(
+                        $"Timeout while waiting for c# project to be rewritten for {k_Timeout.TotalSeconds} seconds"
+                    );
                 Thread.Sleep(10);
             }
         }
