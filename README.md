@@ -15,6 +15,22 @@ Code editor integration for VSCode.
 - .Net Standard 
   - Supports 2022.1 and higher.
 
+## Prerequisites
+
+1. Install both the .Net 7 and .Net 6 SDKs - https://dotnet.microsoft.com/en-us/download 
+2. **[Windows only]** Logout or restart Windows to allow changes to %PATH% to take effect.
+3. **[macOS only]** To avoid seeing "Some projects have trouble loading. Please review the output for more details", make sure to install the latest stable [Mono](https://www.mono-project.com/download/) release.
+    - Note: This version of Mono, which is installed into your system, will not interfere with the version of MonoDevelop that is installed by Unity.
+4. Install the C# extension from the VS Code Marketplace.
+5. Install Build Tools for Visual Studio (Windows only)
+
+The C# extension no longer ships with Microsoft Build Tools so they must be installed manually.
+
+- Download the [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
+- Install the .NET desktop build tools workload. No other components are required.
+
+
+
 ## Install via Package Manager
 
 Please follow the instrustions:
