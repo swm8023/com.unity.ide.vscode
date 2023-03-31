@@ -18,9 +18,9 @@ namespace VSCodeEditor.Runtime_spec.CSProject
         [SerializeField]
         protected IGenerator m_ProjectGeneration;
         [SerializeField]
-        List<string> m_GeneratedFiles = new List<string>();
+        List<string> m_GeneratedFiles = new();
         [SerializeField]
-        List<string> m_DirectoriesToDelete = new List<string>();
+        List<string> m_DirectoriesToDelete = new();
         [SerializeField]
         protected string m_CsProjPath;
         [SerializeField]
