@@ -6,8 +6,8 @@ Code editor integration for VSCode.
 ## Features
 - Complete SDK support
 - Auto Generation for omnisharp.json & .editorconfig
-- useModernNet = true (predefined in omnisharp.json)
-- Visual Studio's [Microsoft.Unity.Analyzers](https://github.com/microsoft/Microsoft.Unity.Analyzers) 
+- `useModernNet = true` (predefined in omnisharp.json)
+- Visual Studio's [Microsoft.Unity.Analyzers](https://github.com/microsoft/Microsoft.Unity.Analyzers) version `1.16.1`
 
 ## API Compatibility Level Support
 - .Net Framework 
@@ -18,7 +18,7 @@ Code editor integration for VSCode.
 ## Prerequisites
 
 1. Install both the .Net 7 and .Net 6 SDKs - https://dotnet.microsoft.com/en-us/download 
-2. **[Windows only]** Logout or restart Windows to allow changes to %PATH% to take effect.
+2. **[Windows only]** Logout or restart Windows to allow changes to `%PATH%` to take effect.
 3. **[macOS only]** To avoid seeing "Some projects have trouble loading. Please review the output for more details", make sure to install the latest stable [Mono](https://www.mono-project.com/download/) release.
     - Note: This version of Mono, which is installed into your system, will not interfere with the version of MonoDevelop that is installed by Unity.
 4. Install the C# extension from the VS Code Marketplace.
