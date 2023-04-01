@@ -36,7 +36,8 @@ namespace VSCodeEditor
         const string k_WindowsNewline = "\r\n";
 
         const string k_SettingsJson =
-            @"{
+                                 /*lang=json,strict*/
+                                 @"{
     ""files.exclude"":
     {
         ""**/.DS_Store"":true,
@@ -100,6 +101,34 @@ namespace VSCodeEditor
 		}
 	]
 }";
+
+        const string k_OmniSharpJson =
+            @"{
+    ""RoslynExtensionsOptions"": {
+        ""enableRoslynAnalyzers"": true,
+        ""enableEditorConfigSupport"": true,
+        ""sdkIncludePrereleases"": false,
+        ""organizeImportsOnFormat"": true,
+        ""threadsToUseForAnalyzers"": true,
+        ""useModernNet"": true,
+        ""documentAnalysisTimeoutMs"": 600000,
+        ""LocationPaths"": [""./NuGet""]
+    }
+}";
+
+        const string k_EditorConfig =
+            @"# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# 4 space indentation
+[*.cs]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+";
+
 
         /// <summary>
         /// Map source extensions to ScriptingLanguages
@@ -178,7 +207,8 @@ namespace VSCodeEditor
                 new AssemblyNameProvider(),
                 new FileIOProvider(),
                 new GUIDProvider()
-            ) { }
+            )
+        { }
 
         public ProjectGeneration(
             string tempDirectory,
@@ -422,6 +452,9 @@ namespace VSCodeEditor
 
             WriteVSCodeSettingsFiles();
             WriteWorkspaceFile();
+            WriteOmniSharpConfigFile();
+            WriteEditorConfigFile();
+            WriteUnityAnalyzersFile();
         }
 
         List<ResponseFileData> ParseResponseFileData(Assembly assembly)
@@ -460,7 +493,7 @@ namespace VSCodeEditor
         Dictionary<string, List<XElement>> GenerateAllAssetProjectParts()
         {
             Dictionary<string, List<XElement>> stringBuilders =
-                new Dictionary<string, List<XElement>>();
+                new();
             foreach (string asset in m_AssemblyNameProvider.GetAllAssetPaths())
             {
                 // Exclude files coming from packages except if they are internalized.
@@ -677,8 +710,10 @@ namespace VSCodeEditor
                 new XAttribute("Include", Path.GetFileNameWithoutExtension(escapedFullPath))
             );
 
-            var hintPath = new XElement("HintPath");
-            hintPath.Value = escapedFullPath;
+            var hintPath = new XElement("HintPath")
+            {
+                Value = escapedFullPath
+            };
             reference.Add(hintPath);
             projectBuilder.Add(reference);
         }
@@ -695,16 +730,20 @@ namespace VSCodeEditor
             var langVersion = GenerateLangVersion(otherArguments["langversion"], assembly);
 
             var commonPropertyGroup = new XElement("PropertyGroup");
-            var langElement = new XElement("LangVersion");
-            langElement.Value = langVersion;
+            var langElement = new XElement("LangVersion")
+            {
+                Value = langVersion
+            };
             commonPropertyGroup.Add(langElement);
 
             // Allow unsafe code
             bool allowUnsafeCode =
                 assembly.compilerOptions.AllowUnsafeCode | responseFilesData.Any(x => x.Unsafe);
 
-            var unsafeElement = new XElement("AllowUnsafeBlocks");
-            unsafeElement.Value = allowUnsafeCode.ToString();
+            var unsafeElement = new XElement("AllowUnsafeBlocks")
+            {
+                Value = allowUnsafeCode.ToString()
+            };
             commonPropertyGroup.Add(unsafeElement);
 
             var warningLevel = new XElement("WarningLevel", "4");
@@ -727,8 +766,10 @@ namespace VSCodeEditor
                     .ToArray()
             );
             var definePropertyGroup = new XElement("PropertyGroup");
-            var definesElement = new XElement("DefineConstants");
-            definesElement.Value = defines;
+            var definesElement = new XElement("DefineConstants")
+            {
+                Value = defines
+            };
             definePropertyGroup.Add(definesElement);
             builder.Add(definePropertyGroup);
 
@@ -740,8 +781,10 @@ namespace VSCodeEditor
                 {
                     foreach (var item in ruleSets)
                     {
-                        var ruleElement = new XElement("CodeAnalysisRuleSet");
-                        ruleElement.Value = item;
+                        var ruleElement = new XElement("CodeAnalysisRuleSet")
+                        {
+                            Value = item
+                        };
                         commonPropertyGroup.Add(ruleElement);
                     }
                 }
@@ -797,7 +840,7 @@ namespace VSCodeEditor
 #endif
         }
 
-        private static string GenerateAnalyserRuleSet(string[] paths)
+        private static string GenerateAnalyzerRuleSet(string[] paths)
         {
             return paths.Length == 0
                 ? string.Empty
@@ -827,11 +870,11 @@ namespace VSCodeEditor
                                 return new KeyValuePair<string, string>(key, b[(index + 1)..]);
                             }
 
-                            const string warnaserror = "warnaserror";
-                            return b[1..].StartsWith(warnaserror)
+                            const string warnAsError = "warnaserror";
+                            return b[1..].StartsWith(warnAsError)
                                 ? new KeyValuePair<string, string>(
-                                    warnaserror,
-                                    b[(warnaserror.Length + 1)..]
+                                    warnAsError,
+                                    b[(warnAsError.Length + 1)..]
                                 )
                                 : default;
                         });
@@ -867,30 +910,22 @@ namespace VSCodeEditor
 
         private static string GetTargetFrameworkVersion(ApiCompatibilityLevel netSettings)
         {
-            switch (netSettings)
+            return netSettings switch
             {
-                case ApiCompatibilityLevel.NET_2_0:
-                case ApiCompatibilityLevel.NET_2_0_Subset:
+                ApiCompatibilityLevel.NET_2_0 or ApiCompatibilityLevel.NET_2_0_Subset or
 #if !UNITY_2021_1_OR_NEWER
-                case ApiCompatibilityLevel.NET_4_6:
+                ApiCompatibilityLevel.NET_4_6 or
 #endif
-                case ApiCompatibilityLevel.NET_Web:
-                case ApiCompatibilityLevel.NET_Micro:
-                    return k_TargetFrameworkVersion;
+                ApiCompatibilityLevel.NET_Web or ApiCompatibilityLevel.NET_Micro => k_TargetFrameworkVersion,
 #if !UNITY_2021_1_OR_NEWER
-                case ApiCompatibilityLevel.NET_Standard_2_0:
-                    return "netstandard2.0";
+                ApiCompatibilityLevel.NET_Standard_2_0 => "netstandard2.0",
 #endif
 #if UNITY_2021_1_OR_NEWER
-                case ApiCompatibilityLevel.NET_Standard:
-                    return "netstandard2.1";
-                case ApiCompatibilityLevel.NET_Unity_4_8:
-                    return k_TargetFrameworkVersion;
-#else
+                ApiCompatibilityLevel.NET_Standard => "netstandard2.1",
+                ApiCompatibilityLevel.NET_Unity_4_8 => k_TargetFrameworkVersion,
 #endif
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         void SyncSolution(IEnumerable<Assembly> assemblies)
@@ -900,8 +935,8 @@ namespace VSCodeEditor
 
         string SolutionText(IEnumerable<Assembly> assemblies)
         {
-            var fileversion = "11.00";
-            var vsversion = "2010";
+            var fileVersion = "11.00";
+            var vsVersion = "2010";
 
             var relevantAssemblies = RelevantAssembliesForMode(assemblies);
             string projectEntries = GetProjectEntries(relevantAssemblies);
@@ -913,8 +948,8 @@ namespace VSCodeEditor
             );
             return string.Format(
                 GetSolutionText(),
-                fileversion,
-                vsversion,
+                fileVersion,
+                vsVersion,
                 projectEntries,
                 projectConfigurations
             );
@@ -926,7 +961,7 @@ namespace VSCodeEditor
         }
 
         /// <summary>
-        /// Get a Project("{guid}") = "MyProject", "MyProject.csproj", "{projectguid}"
+        /// Get a Project("{guid}") = "MyProject", "MyProject.csproj", "{projectGuid}"
         /// entry for each relevant language
         /// </summary>
         string GetProjectEntries(IEnumerable<Assembly> assemblies)
@@ -997,6 +1032,52 @@ namespace VSCodeEditor
 
             if (!m_FileIOProvider.Exists(workspaceFile))
                 m_FileIOProvider.WriteAllText(workspaceFile, k_WorkspaceJson);
+        }
+
+        void WriteOmniSharpConfigFile()
+        {
+            var omniSharpConfig = Path.Combine(ProjectDirectory, "omnisharp.json");
+
+            if (!m_FileIOProvider.Exists(omniSharpConfig))
+                m_FileIOProvider.WriteAllText(omniSharpConfig, k_OmniSharpJson);
+        }
+
+        void WriteEditorConfigFile()
+        {
+            var editorConfig = Path.Combine(ProjectDirectory, ".editorconfig");
+
+            if (!m_FileIOProvider.Exists(editorConfig))
+                m_FileIOProvider.WriteAllText(editorConfig, k_EditorConfig);
+        }
+
+        void WriteUnityAnalyzersFile()
+        {
+            var nugetDirectory = Path.Combine(ProjectDirectory, "NuGet");
+
+            if (!m_FileIOProvider.Exists(nugetDirectory))
+                m_FileIOProvider.CreateDirectory(nugetDirectory);
+
+            var unityAnalyzers = Path.Combine(nugetDirectory, "Microsoft.Unity.Analyzers.dll");
+
+            /*
+                This is the path to the roslyn analyzers dll in the Unity package, and is the only way
+                I could find to get the analyzers dll into the project without extra user setup
+            */
+            var unityRoslynKoalafiedDLL = Path.Combine(
+                ProjectDirectory,
+                "Packages",
+                "com.tsk.ide.vscode",
+                "Editor",
+                "NuGet",
+                "Microsoft.Unity.Analyzers.dll.koala"
+            );
+
+            /*
+                This file will be overwritten if it already exists in case the version of the analyzers changes
+                I could use a txt file to store the version of the analyzers, and only overwrite if the version changes
+                but I don't think it's worth the effort
+            */
+            m_FileIOProvider.Copy(unityRoslynKoalafiedDLL, unityAnalyzers, true);
         }
     }
 

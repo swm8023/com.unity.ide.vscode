@@ -56,7 +56,27 @@ namespace VSCodeEditor.Tests
 
         public void CreateDirectory(string pathName)
         {
+            if (fileToContent.ContainsKey(pathName))
+            {
+                throw new Exception($"{pathName}: already exists.");
+            }
+
             fileToContent[pathName] = "";
+        }
+
+        public void Copy(string sourceFileName, string destFileName, bool overwrite)
+        {
+            if (!fileToContent.ContainsKey(sourceFileName))
+            {
+                throw new Exception($"{sourceFileName}: has not been created.");
+            }
+
+            if (fileToContent.ContainsKey(destFileName) && !overwrite)
+            {
+                throw new Exception($"{destFileName}: already exists.");
+            }
+
+            fileToContent[destFileName] = fileToContent[sourceFileName];
         }
     }
 
