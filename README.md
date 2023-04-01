@@ -29,8 +29,6 @@ The C# extension no longer ships with Microsoft Build Tools so they must be inst
 - Download the [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
 - Install the .NET desktop build tools workload. No other components are required.
 
-
-
 ## Install via Package Manager
 
 Please follow the instrustions:
@@ -67,3 +65,16 @@ Alternatively, merge the snippet to Packages/manifest.json
     }
 }
 ```
+
+## Contributing
+
+Thank you for considering contributing to the com.tsk.ide.vscode package! To contribute, please follow these guidelines:
+
+- Create a new branch for your changes.
+- Discuss your changes by creating a new issue in the repository before starting work.
+- Follow the existing coding conventions and style.
+- Provide a clear description of your changes in your pull request.
+- Ensure your changes are compatible with the current API compatibility level support mentioned in the README.
+- Submit your pull request to the develop branch.
+
+We appreciate all contributions to com.tsk.ide.vscode!
