@@ -31,6 +31,16 @@ The C# extension no longer ships with Microsoft Build Tools so they must be inst
 
 ## Install via Package Manager
 
+### Unity
+
+- Open Window/Package Manager
+- Click +
+- Select Add package from git URL
+- Paste `https://github.com/Chizaruu/com.tsk.ide.vscode.git#upm` into URL
+- Click Add
+
+### OpenUPM
+
 Please follow the instrustions:
 
 - Open Edit/Project Settings/Package Manager
