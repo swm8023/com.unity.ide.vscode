@@ -1,23 +1,26 @@
 # com.tsk.ide.vscode
+
 Code editor integration for VSCode.
 
 [![openupm](https://img.shields.io/npm/v/com.tsk.ide.vscode?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.tsk.ide.vscode/)
 
 ## Features
+
 - Complete SDK support
 - Auto Generation for omnisharp.json & .editorconfig
 - `useModernNet = true` (predefined in omnisharp.json)
 - Visual Studio's [Microsoft.Unity.Analyzers](https://github.com/microsoft/Microsoft.Unity.Analyzers) version `1.16.1`
 
 ## API Compatibility Level Support
-- .Net Framework 
-  - Supports all Unity Versions(*)
-- .Net Standard 
+
+- .Net Framework
+  - Supports 2020.3 and higher.
+- .Net Standard
   - Supports 2022.1 and higher.
 
 ## Prerequisites
 
-1. Install both the .Net 7 and .Net 6 SDKs - https://dotnet.microsoft.com/en-us/download 
+1. Install both the .Net 7 and .Net 6 SDKs - <https://dotnet.microsoft.com/en-us/download>
 2. **[Windows only]** Logout or restart Windows to allow changes to `%PATH%` to take effect.
 3. **[macOS only]** To avoid seeing "Some projects have trouble loading. Please review the output for more details", make sure to install the latest stable [Mono](https://www.mono-project.com/download/) release.
     - Note: This version of Mono, which is installed into your system, will not interfere with the version of MonoDevelop that is installed by Unity.
@@ -45,11 +48,13 @@ Please follow the instrustions:
 
 - Open Edit/Project Settings/Package Manager
 - Add a new Scoped Registry (or edit the existing OpenUPM entry)
+
 ```text
   Name: package.openupm.com
   URL: https://package.openupm.com
   Scope(s): com.tsk.ide.vscode
 ```
+
 - Click Save (or Apply)
 - Open Window/Package Manager
 - Click +
@@ -59,6 +64,7 @@ Please follow the instrustions:
 - Click Add
 
 Alternatively, merge the snippet to Packages/manifest.json
+
 ```json
 {
     "scopedRegistries": [
