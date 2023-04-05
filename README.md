@@ -9,7 +9,7 @@ Code editor integration for VSCode.
 - Complete SDK support
 - Auto Generation for omnisharp.json & .editorconfig
 - `useModernNet = true` (predefined in omnisharp.json)
-- Visual Studio's [Microsoft.Unity.Analyzers](https://github.com/microsoft/Microsoft.Unity.Analyzers) version `1.16.1`
+- [Microsoft.Unity.Analyzers](https://github.com/microsoft/Microsoft.Unity.Analyzers) [![NuGet](https://img.shields.io/nuget/v/Microsoft.Unity.Analyzers.svg)](https://nuget.org/packages/Microsoft.Unity.Analyzers)
 
 ## API Compatibility Level Support
 
@@ -60,7 +60,7 @@ Please follow the instrustions:
 - Click +
 - Select Add package by name... or Add package from git URL...
 - Paste com.tsk.ide.vscode into name
-- Paste 1.3.1 into version
+- Paste 1.3.2 into version
 - Click Add
 
 Alternatively, merge the snippet to Packages/manifest.json
@@ -77,7 +77,7 @@ Alternatively, merge the snippet to Packages/manifest.json
         }
     ],
     "dependencies": {
-        "com.tsk.ide.vscode": "1.3.1"
+        "com.tsk.ide.vscode": "1.3.2"
     }
 }
 ```
@@ -91,6 +91,6 @@ Thank you for considering contributing to the com.tsk.ide.vscode package! To con
 - Follow the existing coding conventions and style.
 - Provide a clear description of your changes in your pull request.
 - Ensure your changes are compatible with the current API compatibility level support mentioned in the README.
-- Submit your pull request to the develop branch.
+- Submit your pull request to the default branch.
 
 We appreciate all contributions to com.tsk.ide.vscode!
