@@ -16,7 +16,8 @@ Code editor integration for VSCode.
 - .Net Framework
   - Supports 2020.3 and higher.
 - .Net Standard
-  - Supports 2022.1 and higher.
+  - Supports 2021.3 and higher.
+  - (Note) Editor specific .csproj files aren't currently built correctly. (https://github.com/Chizaruu/com.tsk.ide.vscode/issues/26)
 
 ## Prerequisites
 
