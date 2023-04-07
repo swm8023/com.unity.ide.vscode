@@ -6,18 +6,25 @@ Code editor integration for VSCode.
 
 ## Features
 
-- Complete SDK support
-- Auto Generation for omnisharp.json & .editorconfig
-- `useModernNet = true` (predefined in omnisharp.json)
-- [Microsoft.Unity.Analyzers](https://github.com/microsoft/Microsoft.Unity.Analyzers) [![NuGet](https://img.shields.io/nuget/v/Microsoft.Unity.Analyzers.svg)](https://nuget.org/packages/Microsoft.Unity.Analyzers)
+### Project SDK Support
 
-## API Compatibility Level Support
+This package provides project SDK support according to .Net 7 and .Net 6. This means that you can use the latest C# features and language features in your Unity projects.
 
-- .Net Framework
-  - Supports 2020.3 and higher.
-- .Net Standard
-  - Supports 2021.3 and higher.
-  - (Note) Editor specific .csproj files aren't currently built correctly. (https://github.com/Chizaruu/com.tsk.ide.vscode/issues/26)
+### Auto Generation for omnisharp.json & .editorconfig
+
+The com.tsk.ide.vscode package automatically generates omnisharp.json and .editorconfig files, saving you the time and effort of setting up these files manually.
+
+These files are essential for configuring Visual Studio Code to work efficiently with Unity.
+
+### Predefined Settings for omnisharp.json (useModernNet = true)
+
+The package comes with predefined settings for omnisharp.json.
+
+This feature enables the use of modern .NET features in your Unity projects, improving their overall performance and stability.
+
+### Microsoft.Unity.Analyzers [![NuGet](https://img.shields.io/nuget/v/Microsoft.Unity.Analyzers.svg)](https://nuget.org/packages/Microsoft.Unity.Analyzers)
+
+The package also includes support for the [Microsoft.Unity.Analyzers](https://github.com/microsoft/Microsoft.Unity.Analyzers) library which provides additional code analysis and validation tools for Unity projects.
 
 ## Prerequisites
 
