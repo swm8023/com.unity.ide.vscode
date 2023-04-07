@@ -1,8 +1,8 @@
 # com.tsk.ide.vscode
 
-Code editor integration for VSCode.
-
 [![openupm](https://img.shields.io/npm/v/com.tsk.ide.vscode?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.tsk.ide.vscode/)
+
+Code editor integration for VSCode. **(2021.3+)**
 
 ## Features
 
