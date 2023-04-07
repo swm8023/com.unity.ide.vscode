@@ -68,7 +68,7 @@ Please follow the instrustions:
 - Click +
 - Select Add package by name... or Add package from git URL...
 - Paste com.tsk.ide.vscode into name
-- Paste 1.3.2 into version
+- Paste 1.3.4 into version
 - Click Add
 
 Alternatively, merge the snippet to Packages/manifest.json
@@ -85,7 +85,7 @@ Alternatively, merge the snippet to Packages/manifest.json
         }
     ],
     "dependencies": {
-        "com.tsk.ide.vscode": "1.3.2"
+        "com.tsk.ide.vscode": "1.3.4"
     }
 }
 ```
