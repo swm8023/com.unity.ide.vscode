@@ -703,7 +703,6 @@ namespace VSCodeEditor.Tests
 
         class References : ProjectGenerationTestBase
         {
-#if UNITY_2020_2_OR_NEWER
             [Test]
             public void RoslynAnalyzerDlls_WillBeIncluded()
             {
@@ -739,7 +738,6 @@ namespace VSCodeEditor.Tests
                     MakeAbsolutePath(roslynAnalyzerRuleSetPath).NormalizePath()
                 );
             }
-#endif
 
             [Test]
             public void Containing_PathWithSpaces_IsParsedCorrectly()
