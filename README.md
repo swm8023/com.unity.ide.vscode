@@ -100,7 +100,6 @@ Thank you for considering contributing to the com.tsk.ide.vscode package! To con
 - Discuss your changes by creating a new issue in the repository before starting work.
 - Follow the existing coding conventions and style.
 - Provide a clear description of your changes in your pull request.
-- Ensure your changes are compatible with the current API compatibility level support mentioned in the README.
 - Submit your pull request to the default branch.
 
 We appreciate all contributions to com.tsk.ide.vscode!
