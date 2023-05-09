@@ -15,3 +15,5 @@
 *.code-workspace
 
 omnisharp.json
+
+TSKDoNotDelete.txt
