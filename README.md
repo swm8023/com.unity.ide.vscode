@@ -89,7 +89,7 @@ Alternatively, merge the snippet to Packages/manifest.json
         }
     ],
     "dependencies": {
-        "com.tsk.ide.vscode": "1.3.6"
+        "com.tsk.ide.vscode": "1.3.7"
     }
 }
 ```
