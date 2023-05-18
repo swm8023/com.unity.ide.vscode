@@ -20,6 +20,7 @@ namespace VSCodeEditor
         void Sync();
         string SolutionFile();
         string ProjectDirectory { get; }
+        string CSharpProjFoldersDirectory { get; }
         IAssemblyNameProvider AssemblyNameProvider { get; }
         bool SolutionExists();
     }
@@ -70,7 +71,11 @@ namespace VSCodeEditor
 
         string[] m_ProjectSupportedExtensions = Array.Empty<string>();
 
+        const string m_TargetCSharpProjFolders = "CSharpProjFolders";
+
         public string ProjectDirectory { get; }
+        public string CSharpProjFoldersDirectory =>
+            Path.Combine(ProjectDirectory, m_TargetCSharpProjFolders);
         IAssemblyNameProvider IGenerator.AssemblyNameProvider => m_AssemblyNameProvider;
 
         readonly string m_ProjectName;
@@ -100,6 +105,11 @@ namespace VSCodeEditor
             m_AssemblyNameProvider = assemblyNameProvider;
             m_FileIOProvider = fileIO;
             m_GUIDProvider = guidGenerator;
+
+            if (!m_FileIOProvider.DirectoryExists(CSharpProjFoldersDirectory))
+            {
+                m_FileIOProvider.CreateDirectory(CSharpProjFoldersDirectory);
+            }
         }
 
         /// <summary>
@@ -396,10 +406,11 @@ namespace VSCodeEditor
                     }
 
                     var noneElement = new XElement("None");
-                    noneElement.SetAttributeValue(
-                        "Include",
-                        m_FileIOProvider.EscapedRelativePathFor(asset, ProjectDirectory)
-                    );
+
+                    var fullFile = m_FileIOProvider.EscapedRelativePathFor(asset, ProjectDirectory);
+
+                    fullFile = Path.Combine(ProjectDirectory, fullFile);
+                    noneElement.SetAttributeValue("Include", fullFile);
                     projectBuilder.Add(noneElement);
                 }
             }
@@ -469,6 +480,7 @@ namespace VSCodeEditor
         <PropertyGroup>
             <TargetFramework>netstandard2.1</TargetFramework>
             <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+            <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         </PropertyGroup>
         <PropertyGroup>
             <DefaultItemExcludes>$(DefaultItemExcludes);Library/;**/*.*</DefaultItemExcludes>
@@ -504,7 +516,10 @@ namespace VSCodeEditor
 
                 foreach (var file in assembly.sourceFiles)
                 {
+                    // It should have the entire path to the source file
                     var fullFile = m_FileIOProvider.EscapedRelativePathFor(file, ProjectDirectory);
+
+                    fullFile = Path.Combine(ProjectDirectory, fullFile);
                     itemGroup.Add(
                         new XElement("Compile", new XAttribute("Include", $"{fullFile}"))
                     );
@@ -558,7 +573,17 @@ namespace VSCodeEditor
                 {
                     var packRefElement = new XElement(
                         "ProjectReference",
-                        new XAttribute("Include", reference.name + GetProjectExtension())
+                        new XAttribute(
+                            "Include",
+                            // It should have the entire path to the project file
+                            Path.Combine(
+                                CSharpProjFoldersDirectory,
+                                reference.name,
+                                reference.name + GetProjectExtension()
+                            )
+                        ),
+                        new XElement("Project", $"{ProjectGuid(reference.name)}"),
+                        new XElement("Name", reference.name + GetProjectExtension())
                     );
 
                     assemblyRefItemGroup.Add(packRefElement);
@@ -567,7 +592,6 @@ namespace VSCodeEditor
                 project.Add(assemblyRefItemGroup);
             }
 
-            // Add the analyzers reference to only Assets folder assemblies or to all assemblies if ProjectGenerationFlag.Analyzers is set to true
             if (
                 m_AssemblyNameProvider.ProjectGenerationFlag.HasFlag(
                     ProjectGenerationFlag.Analyzers
@@ -786,7 +810,18 @@ namespace VSCodeEditor
         {
             var fileBuilder = new StringBuilder(assembly.name);
             _ = fileBuilder.Append(".csproj");
-            return Path.Combine(ProjectDirectory, fileBuilder.ToString());
+
+            string csharpProjectFolderPath = Path.Combine(
+                CSharpProjFoldersDirectory,
+                assembly.name
+            );
+
+            if (!m_FileIOProvider.DirectoryExists(csharpProjectFolderPath))
+            {
+                m_FileIOProvider.CreateDirectory(csharpProjectFolderPath);
+            }
+
+            return Path.Combine(csharpProjectFolderPath, fileBuilder.ToString());
         }
 
         public string SolutionFile()
@@ -927,21 +962,28 @@ namespace VSCodeEditor
         }
 
         /// <summary>
-        /// Get a Project("{guid}") = "MyProject", "MyProject.csproj", "{projectGuid}"
-        /// entry for each relevant language
+        /// Get a Project("{guid}") = "MyProject", "{m_TargetCSharpProjFolders}/{projectFileName}/MyProject.csproj", "{projectGuid}"
+        /// /// entry for each relevant language
         /// </summary>
         string GetProjectEntries(IEnumerable<Assembly> assemblies)
         {
-            var projectEntries = assemblies.Select(
-                i =>
-                    string.Format(
-                        m_SolutionProjectEntryTemplate,
-                        SolutionGuid(i),
-                        i.name,
-                        Path.GetFileName(ProjectFile(i)),
-                        ProjectGuid(i.name)
-                    )
-            );
+            var projectEntries = assemblies.Select(i =>
+            {
+                var projectName = Path.GetFileName(ProjectFile(i));
+
+                var projectFileName = projectName.Substring(
+                    0,
+                    projectName.Length - GetProjectExtension().Length
+                );
+
+                return string.Format(
+                    m_SolutionProjectEntryTemplate,
+                    SolutionGuid(i),
+                    i.name,
+                    $"{m_TargetCSharpProjFolders}/{projectFileName}/{projectName}",
+                    ProjectGuid(i.name)
+                );
+            });
 
             return string.Join(k_WindowsNewline, projectEntries.ToArray());
         }
@@ -974,38 +1016,21 @@ namespace VSCodeEditor
 
         void GenerateNugetJsonSourceFiles()
         {
-            // Generate the nuget.json file for each csproj by getting each csproj as a string and then calling dotnet restore
-            var csprojFiles = Directory.GetFiles(
-                ProjectDirectory,
-                "*.csproj",
-                SearchOption.AllDirectories
-            );
-
-            foreach (var csprojFile in csprojFiles)
-            {
-                //Run dotnet restore on the csproj file to generate the nuget.json file
-                RunDotnetProcess($"restore \"{csprojFile}\"");
-            }
-        }
-
-        void RunDotnetProcess(string arguments)
-        {
             System.Diagnostics.Process process = new();
 
             System.Diagnostics.ProcessStartInfo processStartInfo =
                 new()
                 {
                     FileName = "dotnet",
-                    Arguments = arguments,
+                    Arguments = "build",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
+
             process.StartInfo = processStartInfo;
 
-            _ = process.Start();
-
-            process.WaitForExit();
+            process.Start();
 
             process.Close();
         }
