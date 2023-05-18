@@ -12,7 +12,7 @@ If you find my package useful, please consider giving it a Star 🌟 to show you
 
 ### Project SDK Support
 
-This package provides project SDK support according to .Net 7 and .Net 6. This means that you can use the latest C# features and language features in your Unity projects.
+This package provides project SDK support according to .Net 7 and .Net 6. This means that you can use the latest C# features and language features in your Unity projects (provided Unity supports them).
 
 ### Auto Generation for omnisharp.json & .editorconfig
 
