@@ -30,9 +30,9 @@ In addition to its core features, this package includes seamless integration wit
 
 The `com.tsk.ide.vscode` package provides a professional solution for effortlessly setting up Visual Studio Code to seamlessly integrate with Unity. It automates the generation of essential configuration files, namely omnisharp.json and .editorconfig, sparing you valuable time and effort that would otherwise be spent on manual setup.
 
-### Predefined Settings for omnisharp.json (useModernNet = true)
+### Enable the Full Potential of Modern .NET
 
-Notably, this package includes meticulously predefined settings for `omnisharp.json.` By leveraging these settings, you can unlock the full potential of modern .NET features within your Unity projects, significantly enhancing their performance and stability.
+By eliminating the need to disable the use of ModernNet, you can effortlessly access the complete range of modern .NET features within your Unity projects. This seamless integration unlocks a multitude of benefits, including enhanced performance and improved stability, empowering you to optimize your projects like never before.
 
 ### Customization Options with Externals Tools
 
@@ -80,7 +80,7 @@ Please follow the instrustions:
 -   Click +
 -   Select Add package by name... or Add package from git URL...
 -   Paste com.tsk.ide.vscode into name
--   Paste 1.4.0 into version
+-   Paste 1.4.1 into version
 -   Click Add
 
 Alternatively, merge the snippet to Packages/manifest.json
@@ -95,7 +95,7 @@ Alternatively, merge the snippet to Packages/manifest.json
         }
     ],
     "dependencies": {
-        "com.tsk.ide.vscode": "1.4.0"
+        "com.tsk.ide.vscode": "1.4.1"
     }
 }
 ```
