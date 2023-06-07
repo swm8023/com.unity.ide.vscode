@@ -15,6 +15,7 @@
 *.code-workspace
 
 omnisharp.json
+settings.json
 
 TSKDoNotDelete.txt
 *.dwlt
