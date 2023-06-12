@@ -261,9 +261,8 @@ namespace VSCodeEditor
         bool ShouldFileBePartOfSolution(string file)
         {
             // Exclude files coming from packages except if they are internalized.
-            return m_AssemblyNameProvider.IsInternalizedPackagePath(file)
-                ? false
-                : HasValidExtension(file);
+            return !m_AssemblyNameProvider.IsInternalizedPackagePath(file)
+                && HasValidExtension(file);
         }
 
         bool HasValidExtension(string file)
@@ -971,10 +970,7 @@ namespace VSCodeEditor
             {
                 var projectName = Path.GetFileName(ProjectFile(i));
 
-                var projectFileName = projectName.Substring(
-                    0,
-                    projectName.Length - GetProjectExtension().Length
-                );
+                var projectFileName = projectName[..^GetProjectExtension().Length];
 
                 return string.Format(
                     m_SolutionProjectEntryTemplate,
@@ -1020,95 +1016,36 @@ namespace VSCodeEditor
 
             if (dotnetCommand == null)
             {
-                Debug.LogError("Could not find a compatible dotnet command.");
+                Debug.Log(
+                    "Could not find a compatible dotnet command. Aborting Nuget Json generation."
+                );
                 return;
             }
 
-            using (System.Diagnostics.Process process = new System.Diagnostics.Process())
+            using var process = new System.Diagnostics.Process();
+            var processStartInfo = new System.Diagnostics.ProcessStartInfo
             {
-                System.Diagnostics.ProcessStartInfo processStartInfo =
-                    new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = dotnetCommand,
-                        Arguments = "-c \"dotnet build\"",
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
+                FileName = dotnetCommand,
+                Arguments = "-c \"dotnet build\"",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-                process.StartInfo = processStartInfo;
-                process.Start();
-                process.WaitForExit();
-            }
+            process.StartInfo = processStartInfo;
+            process.Start();
+            process.WaitForExit();
         }
 
         string GetDotnetCommand()
         {
-            string[] possibleCommands = null;
-
-            switch (Application.platform)
-            {
-                case RuntimePlatform.WindowsEditor:
-                    return "dotnet";
-                case RuntimePlatform.LinuxEditor:
-                case RuntimePlatform.OSXEditor:
-                    possibleCommands = new string[]
-                    {
-                        "/bin/zsh",
-                        "/bin/bash",
-                        "/bin/ksh",
-                        "/bin/csh",
-                        "/bin/dash",
-                        "/bin/fish",
-                        "/bin/sh"
-                    };
-                    break;
-                default:
-                    throw new PlatformNotSupportedException(
-                        $"Platform {Application.platform} not supported."
-                    );
-            }
-
-            foreach (string command in possibleCommands)
-            {
-                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
-                {
-                    System.Diagnostics.ProcessStartInfo processStartInfo =
-                        new System.Diagnostics.ProcessStartInfo
-                        {
-                            FileName = command,
-                            Arguments = "-c \"echo Available\"",
-                            RedirectStandardOutput = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                    process.StartInfo = processStartInfo;
-                    try
-                    {
-                        process.Start();
-
-                        string output = process.StandardOutput.ReadToEnd();
-                        process.WaitForExit();
-
-                        if (output.Contains("Available"))
-                        {
-                            return command;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
-                    finally
-                    {
-                        process.Close();
-                    }
-                }
-            }
-
-            Debug.Log($"Could not find a compatible dotnet command.");
-            return null; // No compatible command found
+#if UNITY_EDITOR_WIN
+            return "dotnet";
+#elif UNITY_EDITOR_LINUX
+            return "/bin/bash";
+#elif UNITY_EDITOR_OSX
+            return "/bin/zsh";
+#endif
         }
     }
 
