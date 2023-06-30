@@ -47,7 +47,7 @@ Furthermore, the package introduces a dedicated configuration section within Ext
 4. Install the C# extension from the VS Code Marketplace.
 5. Install Build Tools for Visual Studio (Windows only)
 
-The C# extension no longer ships with Microsoft Build Tools so they must be installed manually.
+The C# extension no longer ships with Microsoft Build Tools, so they must be installed manually.
 
 -   Download the [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
 -   Install the .NET desktop build tools workload. No other components are required.
@@ -99,6 +99,12 @@ Alternatively, merge the snippet to Packages/manifest.json
     }
 }
 ```
+
+## Post Installation
+
+Upon installation, regenerate the `.csproj` files via the **External Tools** tab in Preferences.
+
+Prior Config files are overwritten upon package installation.
 
 ## Contributing
 
